@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Oct 30, 2017 at 06:27 PM
+-- Generation Time: Oct 30, 2017 at 07:26 PM
 -- Server version: 10.1.28-MariaDB
 -- PHP Version: 7.0.24
 
@@ -679,7 +679,7 @@ CREATE TABLE `genus_tbl` (
 
 CREATE TABLE `item_color_tbl` (
   `ItemColorID` int(11) NOT NULL,
-  `ItemID` varchar(50) NOT NULL,
+  `ItemID` varchar(50) CHARACTER SET utf8 NOT NULL,
   `ColorID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -8775,7 +8775,8 @@ ALTER TABLE `genus_tbl`
 --
 ALTER TABLE `item_color_tbl`
   ADD PRIMARY KEY (`ItemColorID`),
-  ADD KEY `ColorID` (`ColorID`);
+  ADD KEY `ColorID` (`ColorID`),
+  ADD KEY `ItemID` (`ItemID`);
 
 --
 -- Indexes for table `item_genre_tbl`
@@ -8940,7 +8941,8 @@ ALTER TABLE `genus_tbl`
 -- Constraints for table `item_color_tbl`
 --
 ALTER TABLE `item_color_tbl`
-  ADD CONSTRAINT `item_color_tbl_ibfk_1` FOREIGN KEY (`ColorID`) REFERENCES `color_tbl` (`ColorID`);
+  ADD CONSTRAINT `item_color_tbl_ibfk_1` FOREIGN KEY (`ColorID`) REFERENCES `color_tbl` (`ColorID`),
+  ADD CONSTRAINT `item_color_tbl_ibfk_2` FOREIGN KEY (`ItemID`) REFERENCES `item_tbl` (`ItemID`);
 
 --
 -- Constraints for table `item_genre_tbl`
