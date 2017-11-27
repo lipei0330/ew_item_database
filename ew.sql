@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 16, 2017 at 06:14 PM
+-- Generation Time: Nov 27, 2017 at 07:53 PM
 -- Server version: 10.1.28-MariaDB
 -- PHP Version: 7.0.24
 
@@ -543,7 +543,7 @@ INSERT INTO `country_origin_tbl` (`CountOrigID`, `CountOrig`) VALUES
 
 CREATE TABLE `feedback_tbl` (
   `FeedbackID` int(11) NOT NULL,
-  `OIID` int(11) NOT NULL,
+  `OPID` int(11) NOT NULL,
   `FitRating` int(11) NOT NULL,
   `StyleRating` int(11) NOT NULL,
   `InWaredrobePurchase` tinyint(1) NOT NULL,
@@ -625,16 +625,6 @@ CREATE TABLE `item_color_tbl` (
   `ColorID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `item_color_tbl`
---
-
-INSERT INTO `item_color_tbl` (`ItemColorID`, `ItemID`, `ColorID`) VALUES
-(1, '1', 1),
-(2, '1', 2),
-(3, '1', 5),
-(4, '1', 8);
-
 -- --------------------------------------------------------
 
 --
@@ -685,6 +675,15 @@ CREATE TABLE `item_size_tbl` (
   `SizeID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `item_size_tbl`
+--
+
+INSERT INTO `item_size_tbl` (`ItemSizeID`, `ItemID`, `SizeID`) VALUES
+(1, '1', 11),
+(2, '1', 38),
+(3, '1', 11);
+
 -- --------------------------------------------------------
 
 --
@@ -726,7 +725,8 @@ CREATE TABLE `item_tbl` (
 --
 
 INSERT INTO `item_tbl` (`ItemID`, `BrandID`, `GenderID`, `MaterialID`, `CountOrigID`, `PatternID`, `MSRP`, `Image`) VALUES
-('1', 1, 1, 1, 1, 1, '$120', NULL);
+('1', 1, 1, 1, 1, 1, '$120', NULL),
+('2', 2, 2, 61, 1, 71, '100', '2');
 
 -- --------------------------------------------------------
 
@@ -834,13 +834,13 @@ INSERT INTO `material_tbl` (`MaterialID`, `Material`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `order_item_tbl`
+-- Table structure for table `order_product_tbl`
 --
 
-CREATE TABLE `order_item_tbl` (
-  `OIID` int(11) NOT NULL,
+CREATE TABLE `order_product_tbl` (
+  `OPID` int(11) NOT NULL,
   `OrderID` int(11) NOT NULL,
-  `ItemSizeID` int(11) NOT NULL
+  `PorductID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -969,6 +969,18 @@ INSERT INTO `pattern_tbl` (`PatternID`, `Pattern`) VALUES
 (94, 'Beach '),
 (95, 'Scotty Dogs'),
 (96, 'Heart');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_tbl`
+--
+
+CREATE TABLE `product_tbl` (
+  `ProductID` int(11) NOT NULL,
+  `ItemColorID` int(11) NOT NULL,
+  `ItemSizeID` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -1192,7 +1204,7 @@ ALTER TABLE `country_origin_tbl`
 --
 ALTER TABLE `feedback_tbl`
   ADD PRIMARY KEY (`FeedbackID`),
-  ADD KEY `ChildID` (`OIID`);
+  ADD KEY `ChildID` (`OPID`);
 
 --
 -- Indexes for table `gender_tbl`
@@ -1242,8 +1254,8 @@ ALTER TABLE `item_season_tbl`
 --
 ALTER TABLE `item_size_tbl`
   ADD PRIMARY KEY (`ItemSizeID`),
-  ADD KEY `ItemID` (`ItemID`),
-  ADD KEY `SizeID` (`SizeID`);
+  ADD KEY `SizeID` (`SizeID`),
+  ADD KEY `item_size_tbl_ibfk_1` (`ItemID`);
 
 --
 -- Indexes for table `item_species_tbl`
@@ -1279,12 +1291,12 @@ ALTER TABLE `material_tbl`
   ADD PRIMARY KEY (`MaterialID`);
 
 --
--- Indexes for table `order_item_tbl`
+-- Indexes for table `order_product_tbl`
 --
-ALTER TABLE `order_item_tbl`
-  ADD PRIMARY KEY (`OIID`),
+ALTER TABLE `order_product_tbl`
+  ADD PRIMARY KEY (`OPID`),
   ADD KEY `OrderID` (`OrderID`),
-  ADD KEY `ItemID` (`ItemSizeID`);
+  ADD KEY `ItemID` (`PorductID`);
 
 --
 -- Indexes for table `order_tbl`
@@ -1298,6 +1310,14 @@ ALTER TABLE `order_tbl`
 --
 ALTER TABLE `pattern_tbl`
   ADD PRIMARY KEY (`PatternID`);
+
+--
+-- Indexes for table `product_tbl`
+--
+ALTER TABLE `product_tbl`
+  ADD PRIMARY KEY (`ProductID`),
+  ADD KEY `ItemColorID` (`ItemColorID`),
+  ADD KEY `ItemSizeID` (`ItemSizeID`);
 
 --
 -- Indexes for table `season_tbl`
@@ -1371,7 +1391,7 @@ ALTER TABLE `child_tbl`
 -- Constraints for table `feedback_tbl`
 --
 ALTER TABLE `feedback_tbl`
-  ADD CONSTRAINT `feedback_tbl_ibfk_1` FOREIGN KEY (`OIID`) REFERENCES `order_item_tbl` (`OIID`);
+  ADD CONSTRAINT `feedback_tbl_ibfk_1` FOREIGN KEY (`OPID`) REFERENCES `order_product_tbl` (`OPID`);
 
 --
 -- Constraints for table `genus_tbl`
@@ -1404,7 +1424,7 @@ ALTER TABLE `item_season_tbl`
 -- Constraints for table `item_size_tbl`
 --
 ALTER TABLE `item_size_tbl`
-  ADD CONSTRAINT `item_size_tbl_ibfk_1` FOREIGN KEY (`ItemID`) REFERENCES `item_tbl` (`ItemID`),
+  ADD CONSTRAINT `item_size_tbl_ibfk_1` FOREIGN KEY (`ItemID`) REFERENCES `item_tbl` (`ItemID`) ON DELETE CASCADE,
   ADD CONSTRAINT `item_size_tbl_ibfk_2` FOREIGN KEY (`SizeID`) REFERENCES `size_tbl` (`SizeID`);
 
 --
@@ -1415,16 +1435,6 @@ ALTER TABLE `item_species_tbl`
   ADD CONSTRAINT `item_species_tbl_ibfk_2` FOREIGN KEY (`ItemID`) REFERENCES `item_tbl` (`ItemID`);
 
 --
--- Constraints for table `item_tbl`
---
-ALTER TABLE `item_tbl`
-  ADD CONSTRAINT `item_tbl_ibfk_1` FOREIGN KEY (`BrandID`) REFERENCES `brand_tbl` (`BrandID`),
-  ADD CONSTRAINT `item_tbl_ibfk_2` FOREIGN KEY (`CountOrigID`) REFERENCES `country_origin_tbl` (`CountOrigID`),
-  ADD CONSTRAINT `item_tbl_ibfk_3` FOREIGN KEY (`GenderID`) REFERENCES `gender_tbl` (`GenderID`),
-  ADD CONSTRAINT `item_tbl_ibfk_4` FOREIGN KEY (`MaterialID`) REFERENCES `material_tbl` (`MaterialID`),
-  ADD CONSTRAINT `item_tbl_ibfk_5` FOREIGN KEY (`PatternID`) REFERENCES `pattern_tbl` (`PatternID`);
-
---
 -- Constraints for table `item_temp_tbl`
 --
 ALTER TABLE `item_temp_tbl`
@@ -1432,17 +1442,24 @@ ALTER TABLE `item_temp_tbl`
   ADD CONSTRAINT `item_temp_tbl_ibfk_2` FOREIGN KEY (`ItemID`) REFERENCES `item_tbl` (`ItemID`);
 
 --
--- Constraints for table `order_item_tbl`
+-- Constraints for table `order_product_tbl`
 --
-ALTER TABLE `order_item_tbl`
-  ADD CONSTRAINT `order_item_tbl_ibfk_1` FOREIGN KEY (`OrderID`) REFERENCES `order_tbl` (`OrderID`),
-  ADD CONSTRAINT `order_item_tbl_ibfk_2` FOREIGN KEY (`ItemSizeID`) REFERENCES `item_size_tbl` (`ItemSizeID`);
+ALTER TABLE `order_product_tbl`
+  ADD CONSTRAINT `order_product_tbl_ibfk_1` FOREIGN KEY (`OrderID`) REFERENCES `order_tbl` (`OrderID`),
+  ADD CONSTRAINT `order_product_tbl_ibfk_2` FOREIGN KEY (`PorductID`) REFERENCES `product_tbl` (`ProductID`);
 
 --
 -- Constraints for table `order_tbl`
 --
 ALTER TABLE `order_tbl`
   ADD CONSTRAINT `order_tbl_ibfk_1` FOREIGN KEY (`AddID`) REFERENCES `address_tbl` (`AddID`);
+
+--
+-- Constraints for table `product_tbl`
+--
+ALTER TABLE `product_tbl`
+  ADD CONSTRAINT `product_tbl_ibfk_1` FOREIGN KEY (`ItemColorID`) REFERENCES `item_color_tbl` (`ItemColorID`),
+  ADD CONSTRAINT `product_tbl_ibfk_2` FOREIGN KEY (`ItemSizeID`) REFERENCES `item_size_tbl` (`ItemSizeID`);
 
 --
 -- Constraints for table `size_chart_tbl`
